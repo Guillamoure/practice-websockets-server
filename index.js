@@ -74,4 +74,15 @@ wsServer.on('request', (req) => {
     }
 
   })
+  connection.on('close', function(reasonCode, description) {
+    console.log("--------")
+    console.log("hmmm?")
+    console.log(reasonCode)
+    console.log(description)
+    let clientIndex = clients.findIndex(cl => cl.userID === userID)
+    console.log(clients.length)
+    clients.splice(clientIndex, 1)
+    // remove client from list once disconnected
+    console.log(clients.length)
+  })
 })
