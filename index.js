@@ -64,6 +64,24 @@ wsServer.on('request', (req) => {
             }
           })
         }
+      } else if (payload.type === "unmount"){
+        let clientIndex = clients.findIndex(cl => cl.userID === userID)
+        let client = clients[clientIndex]
+        console.log(clients.length)
+        // remove self from rooms
+        clients.forEach((cl, i) => {
+          if (cl.gameData.roomID === client.gameData.roomID && i !== clientIndex){
+            let newPlayers = [...cl.gameData.players].filter(p => p.userID !== client.userID)
+            cl.gameData.players = newPlayers
+
+            // send a message to all members of the room
+            cl.connection.sendUTF(JSON.stringify({payload: {players: newPlayers, roomID: cl.gameData.roomID, numOfPlayers: cl.gameData.numOfPlayers}}))
+          }
+        })
+        clients.splice(clientIndex, 1)
+        // remove client from list once disconnected
+        console.log(clients.length)
+
       }
       // clients.forEach(client => {
         // client.connection.sendUTF(message.utf8Data);
@@ -80,7 +98,18 @@ wsServer.on('request', (req) => {
     console.log(reasonCode)
     console.log(description)
     let clientIndex = clients.findIndex(cl => cl.userID === userID)
+    let client = clients[clientIndex]
     console.log(clients.length)
+    // remove self from rooms
+    clients.forEach((cl, i) => {
+      if (cl.gameData.roomID === client.gameData.roomID && i !== clientIndex){
+        let newPlayers = [...cl.gameData.players].filter(p => p.userID !== client.userID)
+        cl.gameData.players = newPlayers
+
+        // send a message to all members of the room
+        cl.connection.sendUTF(JSON.stringify({payload: {players: newPlayers, roomID: cl.gameData.roomID, numOfPlayers: cl.gameData.numOfPlayers}}))
+      }
+    })
     clients.splice(clientIndex, 1)
     // remove client from list once disconnected
     console.log(clients.length)
